@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tool MK TK Final</title>
+<style>
+    body {
+        font-family: Arial;
+        background: #0f172a;
+        color: white;
+        text-align: center;
+        padding: 20px;
+    }
+
+    textarea {
+        width: 90%;
+        height: 100px;
+        padding: 10px;
+        border-radius: 10px;
+        border: none;
+        background: #1e293b;
+        color: #38bdf8;
+    }
+
+    .item {
+        background: #111827;
+        margin: 8px auto;
+        padding: 10px;
+        width: 90%;
+        border-radius: 10px;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 5px 0;
+    }
+
+    .tk { color: #22c55e; }
+    .mk { color: #facc15; }
+
+    button {
+        margin-left: 5px;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .copy { background: #22c55e; }
+    .delete { background: #ef4444; color: white; }
+
+    #result {
+        background: #020617;
+        color: #facc15;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>🔧 TOOL MK | TK (FULL FIX)</h2>
+
+<textarea id="input" placeholder="Dán dạng:
+mk|tk"></textarea>
+<br><br>
+<button onclick="process()">Tạo danh sách</button>
+
+<div id="list"></div>
+
+<h3>📦 Kết quả cuối</h3>
+<textarea id="result" readonly></textarea>
+
+<script>
+let data = [];
+
+function process() {
+    let input = document.getElementById("input").value.trim();
+    let lines = input.split("\n");
+
+    data = [];
+
+    lines.forEach(line => {
+        line = line.trim();
+        if(line.includes("|")) {
+            let parts = line.split("|");
+            if(parts[0] && parts[1]) {
+                data.push({
+                    mk: parts[0].trim(),
+                    tk: parts[1].trim()
+                });
+            }
+        }
+    });
+
+    render();
+}
+
+function safeCopy(text) {
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    let temp = document.createElement("textarea");
+    temp.value = text;
+    document.body.appendChild(temp);
+    temp.select();
+    document.execCommand("copy");
+    document.body.removeChild(temp);
+    alert("Đã copy!");
+}
+
+function render() {
+    let list = document.getElementById("list");
+    list.innerHTML = "";
+
+    data.forEach((item, index) => {
+        let div = document.createElement("div");
+        div.className = "item";
+
+        // TK row
+        let rowTK = document.createElement("div");
+        rowTK.className = "row";
+        rowTK.innerHTML = `
+            <span class="tk">TK: ${item.tk}</span>
+        `;
+
+        let btnCopyTK = document.createElement("button");
+        btnCopyTK.innerText = "Copy TK";
+        btnCopyTK.className = "copy";
+        btnCopyTK.onclick = () => safeCopy(item.tk);
+
+        rowTK.appendChild(btnCopyTK);
+
+        // MK row
+        let rowMK = document.createElement("div");
+        rowMK.className = "row";
+        rowMK.innerHTML = `
+            <span class="mk">MK: ${item.mk}</span>
+        `;
+
+        let btnCopyMK = document.createElement("button");
+        btnCopyMK.innerText = "Copy MK";
+        btnCopyMK.className = "copy";
+        btnCopyMK.onclick = () => safeCopy(item.mk);
+
+        rowMK.appendChild(btnCopyMK);
+
+        // delete
+        let btnDelete = document.createElement("button");
+        btnDelete.innerText = "Xoá dòng";
+        btnDelete.className = "delete";
+        btnDelete.onclick = () => {
+            data.splice(index, 1);
+            render();
+        };
+
+        div.appendChild(rowTK);
+        div.appendChild(rowMK);
+        div.appendChild(btnDelete);
+
+        list.appendChild(div);
+    });
+
+    updateResult();
+}
+
+function updateResult() {
+    let result = data.map(item => item.mk + "|" + item.tk);
+    document.getElementById("result").value = result.join("\n");
+}
+</script>
+
+</body>
+</html></body>
+</html>
